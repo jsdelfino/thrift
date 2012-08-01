@@ -89,7 +89,37 @@ TServerSocket::TServerSocket(int port) :
   intSock1_(-1),
   intSock2_(-1) {}
 
+TServerSocket::TServerSocket(const std::string& host, int port) :
+  host_(host),
+  port_(port),
+  serverSocket_(-1),
+  acceptBacklog_(1024),
+  sendTimeout_(0),
+  recvTimeout_(0),
+  accTimeout_(-1),
+  retryLimit_(0),
+  retryDelay_(0),
+  tcpSendBuffer_(0),
+  tcpRecvBuffer_(0),
+  intSock1_(-1),
+  intSock2_(-1) {}
+
 TServerSocket::TServerSocket(int port, int sendTimeout, int recvTimeout) :
+  port_(port),
+  serverSocket_(-1),
+  acceptBacklog_(1024),
+  sendTimeout_(sendTimeout),
+  recvTimeout_(recvTimeout),
+  accTimeout_(-1),
+  retryLimit_(0),
+  retryDelay_(0),
+  tcpSendBuffer_(0),
+  tcpRecvBuffer_(0),
+  intSock1_(-1),
+  intSock2_(-1) {}
+
+TServerSocket::TServerSocket(const std::string& host, int port, int sendTimeout, int recvTimeout) :
+  host_(host),
   port_(port),
   serverSocket_(-1),
   acceptBacklog_(1024),
@@ -170,8 +200,8 @@ void TServerSocket::listen() {
   hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
   sprintf(port, "%d", port_);
 
-  // Wildcard address
-  error = getaddrinfo(NULL, port, &hints, &res0);
+  // Bind to wildcard address or specified host
+  error = getaddrinfo(host_.length() == 0? NULL : host_.c_str(), port, &hints, &res0);
   if (error) {
     GlobalOutput.printf("getaddrinfo %d: %s", error, gai_strerror(error));
     close();

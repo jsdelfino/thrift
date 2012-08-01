@@ -35,7 +35,9 @@ class TSocket;
 class TServerSocket : public TServerTransport {
  public:
   TServerSocket(int port);
+  TServerSocket(const std::string& host, int port);
   TServerSocket(int port, int sendTimeout, int recvTimeout);
+  TServerSocket(const std::string& host, int port, int sendTimeout, int recvTimeout);
   TServerSocket(std::string path);
 
   ~TServerSocket();
@@ -61,6 +63,7 @@ class TServerSocket : public TServerTransport {
   virtual boost::shared_ptr<TSocket> createSocket(int client);
 
  private:
+  std::string host_;
   int port_;
   std::string path_;
   int serverSocket_;
